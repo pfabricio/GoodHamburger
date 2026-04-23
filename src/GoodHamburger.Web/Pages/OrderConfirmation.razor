@@ -65,8 +65,9 @@
                                     <div>
                                         <span>@(GetIconForType(item.Type))</span>
                                         <span class="ms-2">@item.Name</span>
+                                        <span class="badge bg-secondary ms-2">x@(item.Quantity)</span>
                                     </div>
-                                    <span>R$ @item.UnitPrice.ToString("F2")</span>
+                                    <span>R$ @((item.UnitPrice * item.Quantity).ToString("F2"))</span>
                                 </li>
                             }
                         </ul>

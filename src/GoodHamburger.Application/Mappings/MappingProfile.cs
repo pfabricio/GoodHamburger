@@ -23,7 +23,8 @@ namespace GoodHamburger.Application.Mappings
                 MenuItemId = orderItem.MenuItemId,
                 Name = orderItem.Name,
                 Type = orderItem.Type,
-                UnitPrice = orderItem.UnitPrice.Amount
+                UnitPrice = orderItem.UnitPrice.Amount,
+                Quantity = orderItem.Quantity
             };
         }
 

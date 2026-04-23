@@ -26,17 +26,18 @@ namespace GoodHamburger.Application.Handlers.Orders
                 CustomerName = request.CustomerName
             };
 
-            await AddItemsToOrderAsync(order, request.MenuItemIds, cancellationToken);
+            await AddItemsToOrderAsync(order, request.Items, cancellationToken);
             
             var createdOrder = await _orderRepository.AddAsync(order, cancellationToken);
             return createdOrder.ToDto();
         }
 
-        private async Task AddItemsToOrderAsync(Order order, List<int> menuItemIds, CancellationToken cancellationToken)
+        private async Task AddItemsToOrderAsync(Order order, List<CreateOrderItemRequest> items, CancellationToken cancellationToken)
         {
-            if (menuItemIds == null || !menuItemIds.Any())
+            if (items == null || !items.Any())
                 return;
 
+            var menuItemIds = items.Select(i => i.MenuItemId).ToList();
             var menuItems = await _menuItemRepository.GetByIdsAsync(menuItemIds, cancellationToken);
             var foundIds = menuItems.Select(m => m.Id).ToList();
             var notFoundIds = menuItemIds.Except(foundIds).ToList();
@@ -44,9 +45,17 @@ namespace GoodHamburger.Application.Handlers.Orders
             if (notFoundIds.Any())
                 throw new NotFoundException("MenuItem", string.Join(", ", notFoundIds));
 
-            foreach (var menuItem in menuItems)
+            var menuItemDict = menuItems.ToDictionary(m => m.Id);
+
+            foreach (var itemRequest in items)
             {
-                order.AddItem(menuItem);
+                if (menuItemDict.TryGetValue(itemRequest.MenuItemId, out var menuItem))
+                {
+                    for (int i = 0; i < itemRequest.Quantity; i++)
+                    {
+                        order.AddItem(menuItem);
+                    }
+                }
             }
         }
     }

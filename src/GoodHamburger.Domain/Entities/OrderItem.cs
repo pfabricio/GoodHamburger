@@ -11,6 +11,7 @@ namespace GoodHamburger.Domain.Entities
         public string Name { get; set; } = string.Empty;
         public ItemType Type { get; set; }
         public Money UnitPrice { get; set; }
+        public int Quantity { get; set; } = 1;
         
         public Order Order { get; set; } = null!;
 
@@ -22,6 +23,12 @@ namespace GoodHamburger.Domain.Entities
             Name = menuItem.Name;
             Type = menuItem.Type;
             UnitPrice = menuItem.Price;
+            Quantity = 1;
+        }
+
+        public Money GetTotalPrice()
+        {
+            return UnitPrice.Multiply(Quantity);
         }
     }
 }

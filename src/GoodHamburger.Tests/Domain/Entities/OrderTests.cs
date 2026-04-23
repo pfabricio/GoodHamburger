@@ -19,15 +19,31 @@ namespace GoodHamburger.Tests.Domain.Entities
         }
 
         [Fact]
-        public void AddItem_DuplicateType_ShouldThrowException()
+        public void AddItem_SameMenuItemId_ShouldIncrementQuantity()
+        {
+            var order = new Order();
+            var menuItem = new MenuItem(1, "X Burger", ItemType.Sandwich, 5.00m);
+
+            order.AddItem(menuItem);
+            order.AddItem(menuItem);
+
+            Assert.Single(order.Items);
+            Assert.Equal(2, order.Items.First().Quantity);
+            Assert.Equal(10.00m, order.Subtotal.Amount);
+        }
+
+        [Fact]
+        public void AddItem_DifferentMenuItemId_ShouldAddAsSeparateItem()
         {
             var order = new Order();
             var menuItem1 = new MenuItem(1, "X Burger", ItemType.Sandwich, 5.00m);
             var menuItem2 = new MenuItem(2, "X Egg", ItemType.Sandwich, 4.50m);
 
             order.AddItem(menuItem1);
+            order.AddItem(menuItem2);
 
-            Assert.Throws<DomainException>(() => order.AddItem(menuItem2));
+            Assert.Equal(2, order.Items.Count);
+            Assert.Equal(9.50m, order.Subtotal.Amount);
         }
 
         [Fact]

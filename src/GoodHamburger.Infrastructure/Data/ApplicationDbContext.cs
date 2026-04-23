@@ -64,6 +64,7 @@ namespace GoodHamburger.Infrastructure.Data
                 entity.Property(e => e.UnitPrice).HasConversion(
                     v => v.Amount,
                     v => new Money(v));
+                entity.Property(e => e.Quantity).HasDefaultValue(1);
             });
 
             // Seed data

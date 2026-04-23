@@ -23,20 +23,32 @@ namespace GoodHamburger.Domain.Entities
 
         public void AddItem(MenuItem menuItem)
         {
-            if (_items.Any(i => i.Type == menuItem.Type))
-                throw new DomainException($"Only one {menuItem.Type} allowed per order");
-
-            var orderItem = new OrderItem(menuItem);
-            _items.Add(orderItem);
+            var existingItem = _items.FirstOrDefault(i => i.MenuItemId == menuItem.Id);
+            if (existingItem != null)
+            {
+                existingItem.Quantity++;
+            }
+            else
+            {
+                var orderItem = new OrderItem(menuItem);
+                _items.Add(orderItem);
+            }
             RecalculateTotals();
         }
 
-        public void RemoveItem(ItemType type)
+        public void RemoveItem(int menuItemId)
         {
-            var item = _items.FirstOrDefault(i => i.Type == type);
+            var item = _items.FirstOrDefault(i => i.MenuItemId == menuItemId);
             if (item != null)
             {
-                _items.Remove(item);
+                if (item.Quantity > 1)
+                {
+                    item.Quantity--;
+                }
+                else
+                {
+                    _items.Remove(item);
+                }
                 RecalculateTotals();
             }
         }
@@ -62,7 +74,7 @@ namespace GoodHamburger.Domain.Entities
             Subtotal = Money.Zero;
             foreach (var item in _items)
             {
-                Subtotal = Subtotal.Add(item.UnitPrice);
+                Subtotal = Subtotal.Add(item.GetTotalPrice());
             }
 
             var discountCalculator = new DiscountCalculator();

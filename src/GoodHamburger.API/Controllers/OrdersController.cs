@@ -63,7 +63,7 @@ namespace GoodHamburger.API.Controllers
             var command = new CreateOrderCommand 
             { 
                 CustomerName = request.CustomerName,
-                MenuItemIds = request.MenuItemIds
+                Items = request.Items
             };
             var order = await _mediator.Send(command, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
@@ -82,7 +82,7 @@ namespace GoodHamburger.API.Controllers
             { 
                 Id = id,
                 CustomerName = request.CustomerName,
-                MenuItemIds = request.MenuItemIds
+                Items = request.Items
             };
             var order = await _mediator.Send(command, cancellationToken);
             return Ok(order);

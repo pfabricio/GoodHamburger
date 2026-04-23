@@ -7,6 +7,6 @@ namespace GoodHamburger.Application.Commands.Orders
     {
         public int Id { get; init; }
         public string? CustomerName { get; init; }
-        public List<int> MenuItemIds { get; init; } = new();
+        public List<CreateOrderItemRequest> Items { get; init; } = new();
     }
 }
