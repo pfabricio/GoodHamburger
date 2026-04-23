@@ -11,10 +11,29 @@ Inclui **API REST** e **Frontend Blazor WebAssembly** com interface completa par
 - Cálculo automático de descontos baseado em combinações de itens
 - **Preview de descontos em tempo real** no frontend
 - Cardápio com sanduíches, acompanhamentos e bebidas
-- Validação de regras de negócio (máximo 1 item de cada tipo por pedido)
+- **Múltiplos itens com quantidades** (adicionar mais de 1 sanduíche, bebida ou batata frita)
 - Soft delete de pedidos
 - Paginação na listagem de pedidos
 - Design responsivo com Bootstrap
+
+## 📸 Screenshots
+
+### Telas do Sistema
+
+#### 🏠 Página Inicial
+![Página Inicial](./screenshots/blazor_01.png)
+
+#### 📋 Cardápio
+![Cardápio](./screenshots/blazor_02.png)
+
+#### 🛒 Criar Pedido
+![Criar Pedido](./screenshots/blazor_03.png)
+
+#### 📋 Meus Pedidos
+![Meus Pedidos](./screenshots/blazor_04.png)
+
+#### ✅ Confirmação do Pedido
+![Confirmação do Pedido](./screenshots/blazor_05.png)
 
 ## 🏗️ Arquitetura
 
