@@ -228,12 +228,13 @@ O projeto `GoodHamburger.Web` é uma aplicação Blazor WebAssembly que consome 
 
 - **🏠 Home**: Dashboard com navegação e promoções
 - **📋 Cardápio**: Visualização dos produtos agrupados por categoria
-- **🛒 Criar Pedido**: 
-  - Seleção múltipla de produtos com checkbox
+- **🛒 Criar Pedido**:
+  - Seleção de produtos com controles de quantidade (+/-)
+  - Múltiplos itens do mesmo tipo permitidos (ex: 2 sanduíches, 3 batatas)
   - Carrinho com cálculo de descontos em **tempo real**
   - Preview de economia antes de finalizar
-- **� Meus Pedidos**: Listagem paginada com cards
-- **✅ Confirmação**: Resumo do pedido com valor economizado
+- **📋 Meus Pedidos**: Listagem paginada com cards e status
+- **✅ Confirmação**: Resumo do pedido com valor economizado e quantidades
 
 ### Tecnologias Frontend
 
