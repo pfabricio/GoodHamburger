@@ -37,20 +37,15 @@
                                     @foreach (var item in typeGroup)
                                     {
                                         <div class="col-6">
-                                            <div class="card @(IsSelected(item.Id) ? "border-success" : "border-light") cursor-pointer"
-                                                 @onclick="() => ToggleItem(item)"
-                                                 style="cursor: pointer;">
+                                            <div class="card @(IsSelected(item.Id) ? "border-success" : "border-light")">
                                                 <div class="card-body p-3">
-                                                    <div class="form-check">
-                                                        <input type="checkbox" class="form-check-input" 
-                                                               checked="@IsSelected(item.Id)"
-                                                               @onclick:stopPropagation />
-                                                        <label class="form-check-label w-100">
-                                                            <span class="fs-4">@item.Icon</span>
-                                                            <div class="fw-bold">@item.Name</div>
-                                                            <div class="text-success">R$ @item.Price.ToString("F2")</div>
-                                                        </label>
-                                                    </div>
+                                                    <span class="fs-4">@item.Icon</span>
+                                                    <div class="fw-bold">@item.Name</div>
+                                                    <div class="text-success">R$ @item.Price.ToString("F2")</div>
+                                                    <button class="btn btn-sm @(IsSelected(item.Id) ? "btn-success" : "btn-outline-success") w-100 mt-2"
+                                                            @onclick="() => ToggleItem(item)">
+                                                        @(IsSelected(item.Id) ? "✓ Selecionado" : "+ Adicionar")
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -121,6 +116,13 @@
                                     <span class="text-success">R$ @CalculateTotal().ToString("F2")</span>
                                 </div>
                             </div>
+                            
+                            @* Botão Limpar Carrinho *@
+                            <button class="btn btn-outline-danger w-100 mt-2" 
+                                    @onclick="ClearCart"
+                                    disabled="@(selectedItems.Count == 0)">
+                                🗑️ Limpar Carrinho
+                            </button>
                         }
                         
                         @* Botão Finalizar *@
@@ -192,6 +194,13 @@
             selectedItems.Add(item);
         }
 
+        errorMessage = null;
+        StateHasChanged();
+    }
+
+    private void ClearCart()
+    {
+        selectedItems.Clear();
         errorMessage = null;
         StateHasChanged();
     }
