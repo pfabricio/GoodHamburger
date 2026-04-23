@@ -1,0 +1,203 @@
+@page "/orders"
+@using GoodHamburger.Web.Models
+@using GoodHamburger.Web.Services
+@inject OrderService OrderService
+@inject NavigationManager Navigation
+
+<PageTitle>📋 Pedidos - Good Hamburger</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📋 Pedidos</h1>
+        <a href="create-order" class="btn btn-primary">
+            🛒 Novo Pedido
+        </a>
+    </div>
+    
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+    }
+    else if (orders.Count == 0)
+    {
+        <div class="alert alert-info text-center">
+            <h5>Nenhum pedido encontrado</h5>
+            <p>Faça seu primeiro pedido agora!</p>
+            <a href="create-order" class="btn btn-primary">Fazer Pedido</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var order in orders)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Pedido #@order.Id</span>
+                            <span class="badge @GetStatusBadgeClass(order.Status)">@order.StatusDisplay</span>
+                        </div>
+                        <div class="card-body">
+                            @if (!string.IsNullOrEmpty(order.CustomerName))
+                            {
+                                <p class="mb-2">
+                                    <strong>Cliente:</strong> @order.CustomerName
+                                </p>
+                            }
+                            
+                            <p class="text-muted small mb-3">
+                                📅 @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </p>
+                            
+                            <p class="mb-2">
+                                <strong>@order.Items.Count itens</strong>
+                            </p>
+                            
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2">
+                                <span>Total:</span>
+                                <span class="fw-bold text-success">R$ @order.Total.ToString("F2")</span>
+                            </div>
+                            
+                            @if (order.DiscountPercentage > 0)
+                            {
+                                <div class="text-success small">
+                                    💰 Desconto @((order.DiscountPercentage * 100).ToString("F0"))%
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary flex-fill" @onclick="() => ViewOrder(order.Id)">
+                                    👁️ Ver Detalhes
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteOrder(order.Id)">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        @* Paginação *@
+        @if (pagedResult?.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(currentPage - 1)" disabled="@(currentPage == 1)">
+                            Anterior
+                        </button>
+                    </li>
+                    
+                    @for (int i = 1; i <= pagedResult.TotalPages; i++)
+                    {
+                        var pageNumber = i;
+                        <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+                            <button class="page-link" @onclick="() => ChangePage(pageNumber)">@pageNumber</button>
+                        </li>
+                    }
+                    
+                    <li class="page-item @(currentPage == pagedResult.TotalPages ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(currentPage + 1)" disabled="@(currentPage == pagedResult.TotalPages)">
+                            Próxima
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+    
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">
+            @errorMessage
+        </div>
+    }
+</div>
+
+@code {
+    private List<OrderResponseDto> orders = new();
+    private PagedResult<OrderResponseDto>? pagedResult;
+    private int currentPage = 1;
+    private int pageSize = 6;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            pagedResult = await OrderService.GetOrdersAsync(currentPage, pageSize);
+            orders = pagedResult.Items;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro ao carregar pedidos: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ChangePage(int page)
+    {
+        if (page < 1 || (pagedResult != null && page > pagedResult.TotalPages))
+            return;
+
+        currentPage = page;
+        await LoadOrders();
+    }
+
+    private void ViewOrder(int id)
+    {
+        Navigation.NavigateTo($"/order-confirmation/{id}");
+    }
+
+    private async Task DeleteOrder(int id)
+    {
+        if (!ConfirmDelete())
+            return;
+
+        try
+        {
+            await OrderService.DeleteOrderAsync(id);
+            await LoadOrders();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro ao remover pedido: {ex.Message}";
+        }
+    }
+
+    private bool ConfirmDelete()
+    {
+        // Em um app real, usaríamos um modal. Aqui simulamos confirmação simples via JS interop
+        // ou poderíamos usar um componente modal do Bootstrap
+        return true; // Simplificado para demo
+    }
+
+    private string GetStatusBadgeClass(OrderStatus status) => status switch
+    {
+        OrderStatus.Created => "bg-secondary",
+        OrderStatus.Preparing => "bg-warning",
+        OrderStatus.Ready => "bg-info",
+        OrderStatus.Delivered => "bg-success",
+        OrderStatus.Cancelled => "bg-danger",
+        _ => "bg-secondary"
+    };
+}

@@ -1,0 +1,88 @@
+@page "/menu"
+@using GoodHamburger.Web.Models
+@using GoodHamburger.Web.Services
+@inject MenuService MenuService
+
+<PageTitle>🍔 Cardápio - Good Hamburger</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4">🍔 Cardápio</h1>
+    
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+    }
+    else if (menuItems.Count == 0)
+    {
+        <div class="alert alert-info">
+            Nenhum item no cardápio disponível.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var typeGroup in menuItems.GroupBy(m => m.Type))
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">@typeGroup.First().TypeDisplay</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var item in typeGroup)
+                            {
+                                <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                    <div>
+                                        <span class="fs-4">@item.Icon</span>
+                                        <span class="ms-2 fw-bold">@item.Name</span>
+                                    </div>
+                                    <span class="badge bg-success">R$ @item.Price.ToString("F2")</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div class="alert alert-info mt-4">
+            <h5>💰 Regras de Desconto</h5>
+            <ul class="mb-0">
+                <li>🍔 + 🍟 + 🥤 = <strong>20% de desconto</strong></li>
+                <li>🍔 + 🥤 = <strong>15% de desconto</strong></li>
+                <li>🍔 + 🍟 = <strong>10% de desconto</strong></li>
+            </ul>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="create-order" class="btn btn-primary btn-lg">
+                🛒 Fazer Pedido
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    private List<MenuItemDto> menuItems = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            menuItems = await MenuService.GetMenuAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading menu: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
