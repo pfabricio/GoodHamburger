@@ -22,6 +22,13 @@ namespace GoodHamburger.Infrastructure.Repositories
                 .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
 
+        public async Task<Order?> GetByIdForUpdateAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
+        }
+
         public async Task<IEnumerable<Order>> GetAllAsync(int page = 1, int pageSize = 20, CancellationToken cancellationToken = default)
         {
             return await _context.Orders
@@ -54,13 +61,10 @@ namespace GoodHamburger.Infrastructure.Repositories
             if (existingOrder == null)
                 throw new InvalidOperationException($"Order with id {order.Id} not found");
 
-            // Update order properties
             _context.Entry(existingOrder).CurrentValues.SetValues(order);
 
-            // Remove old items
             _context.OrderItems.RemoveRange(existingOrder.Items);
 
-            // Add new items
             foreach (var item in order.Items)
             {
                 existingOrder.Items.ToList().Add(item);
@@ -78,6 +82,11 @@ namespace GoodHamburger.Infrastructure.Repositories
                 order.MarkAsDeleted();
                 await _context.SaveChangesAsync(cancellationToken);
             }
+        }
+
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

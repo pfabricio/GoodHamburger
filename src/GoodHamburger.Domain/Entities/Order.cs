@@ -78,5 +78,25 @@ namespace GoodHamburger.Domain.Entities
             IsDeleted = true;
             UpdatedAt = DateTime.UtcNow;
         }
+
+        public void ChangeStatus(OrderStatus newStatus)
+        {
+            if (!IsValidStatusTransition(Status, newStatus))
+                throw new DomainException($"Invalid status transition from {Status} to {newStatus}");
+
+            Status = newStatus;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        private static bool IsValidStatusTransition(OrderStatus current, OrderStatus newStatus)
+        {
+            if (newStatus == OrderStatus.Cancelled)
+                return current != OrderStatus.Delivered;
+
+            if (current == OrderStatus.Cancelled || current == OrderStatus.Delivered)
+                return false;
+
+            return (int)newStatus == (int)current + 1;
+        }
     }
 }

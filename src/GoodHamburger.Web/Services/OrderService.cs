@@ -55,5 +55,20 @@ namespace GoodHamburger.Web.Services
             var response = await _httpClient.DeleteAsync($"api/orders/{id}");
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task<OrderResponseDto> UpdateOrderStatusAsync(int id, OrderStatus status)
+        {
+            var request = new { Status = (int)status };
+            var response = await _httpClient.PutAsJsonAsync($"api/orders/{id}/status", request);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new InvalidOperationException($"Failed to update order status: {response.StatusCode} - {errorContent}");
+            }
+            
+            return await response.Content.ReadFromJsonAsync<OrderResponseDto>() 
+                ?? throw new InvalidOperationException("Failed to update order status");
+        }
     }
 }

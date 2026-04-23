@@ -70,6 +70,30 @@
                             }
                         </div>
                         <div class="card-footer">
+                            @if (order.Status != OrderStatus.Delivered && order.Status != OrderStatus.Cancelled)
+                            {
+                                <div class="mb-2">
+                                    <label class="form-label small mb-1">Mudar Status:</label>
+                                    <select class="form-select form-select-sm" @bind="selectedStatus" @bind:after="() => ChangeOrderStatus(order.Id, selectedStatus)">
+                                        <option value="">Selecione...</option>
+                                        @if (order.Status == OrderStatus.Created)
+                                        {
+                                            <option value="@OrderStatus.Preparing">Preparando</option>
+                                            <option value="@OrderStatus.Cancelled">Cancelado</option>
+                                        }
+                                        else if (order.Status == OrderStatus.Preparing)
+                                        {
+                                            <option value="@OrderStatus.Ready">Pronto</option>
+                                            <option value="@OrderStatus.Cancelled">Cancelado</option>
+                                        }
+                                        else if (order.Status == OrderStatus.Ready)
+                                        {
+                                            <option value="@OrderStatus.Delivered">Entregue</option>
+                                            <option value="@OrderStatus.Cancelled">Cancelado</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
                             <div class="d-flex gap-2">
                                 <button class="btn btn-sm btn-outline-primary flex-fill" @onclick="() => ViewOrder(order.Id)">
                                     👁️ Ver Detalhes
@@ -128,6 +152,7 @@
     private int pageSize = 6;
     private bool isLoading = true;
     private string? errorMessage;
+    private OrderStatus selectedStatus;
 
     protected override async Task OnInitializedAsync()
     {
@@ -184,11 +209,26 @@
         }
     }
 
+    private async Task ChangeOrderStatus(int id, OrderStatus newStatus)
+    {
+        if (newStatus == 0) return; 
+        
+        try
+        {
+            await OrderService.UpdateOrderStatusAsync(id, newStatus);
+            selectedStatus = 0; 
+            await LoadOrders();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro ao mudar status: {ex.Message}";
+            selectedStatus = 0; 
+        }
+    }
+
     private bool ConfirmDelete()
     {
-        // Em um app real, usaríamos um modal. Aqui simulamos confirmação simples via JS interop
-        // ou poderíamos usar um componente modal do Bootstrap
-        return true; // Simplificado para demo
+        return true; 
     }
 
     private string GetStatusBadgeClass(OrderStatus status) => status switch

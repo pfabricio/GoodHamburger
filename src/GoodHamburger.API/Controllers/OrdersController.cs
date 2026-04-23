@@ -1,6 +1,7 @@
 using GoodHamburger.Application.Commands.Orders;
 using GoodHamburger.Application.DTOs;
 using GoodHamburger.Application.Queries.Orders;
+using GoodHamburger.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -98,6 +99,24 @@ namespace GoodHamburger.API.Controllers
             var command = new DeleteOrderCommand { Id = id };
             await _mediator.Send(command, cancellationToken);
             return NoContent();
+        }
+
+        /// <summary>
+        /// Update order status
+        /// </summary>
+        [HttpPut("{id:int}/status")]
+        [ProducesResponseType(typeof(OrderResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateOrderStatusRequest request, CancellationToken cancellationToken)
+        {
+            var command = new UpdateOrderStatusCommand 
+            { 
+                Id = id,
+                Status = (OrderStatus)request.Status
+            };
+            var order = await _mediator.Send(command, cancellationToken);
+            return Ok(order);
         }
     }
 }

@@ -24,7 +24,9 @@ builder.Services.AddSwaggerGen(options =>
 // Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySQL(connectionString));
+{
+    if (connectionString != null) options.UseMySQL(connectionString);
+});
 
 // Repositories
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
