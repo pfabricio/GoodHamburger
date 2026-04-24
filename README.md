@@ -122,7 +122,7 @@ cd src/GoodHamburger.API
 dotnet run
 ```
 - API: `http://localhost:5000`
-- Swagger: `http://localhost:5000/`
+- Swagger: `http://localhost:5000/swagger`
 
 **Terminal 2 - Frontend Blazor:**
 ```bash
@@ -142,7 +142,7 @@ cd src/GoodHamburger.API
 dotnet run
 ```
 
-A API estará disponível em `http://localhost:7109`
+A API estará disponível em `http://localhost:5000`
 
 ## 🧪 Executar Testes
 
