@@ -37,7 +37,7 @@ Inclui **API REST** e **Frontend Blazor WebAssembly** com interface completa par
 
 ## 🏗️ Arquitetura
 
-O projeto segue os princípios de Clean Architecture com separação em 4 camadas + CQRS com MediatR:
+O projeto segue os princípios de Clean Architecture com separação em 6 camadas + CQRS com MediatR:
 
 ```
 src/
